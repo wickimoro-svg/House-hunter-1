@@ -115,7 +115,7 @@
 
         .listings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
         }
 
@@ -185,26 +185,26 @@
 <body>
 
     <header>
-        <div class="logo">🏠 HouseHunter</div>
+        <div class="logo">🏠 House Hunter</div>
     </header>
 
     <main class="container">
         <!-- Filter Controls -->
         <section class="filter-card">
             <div class="filter-group">
-                <label for="size-filter">Property Size (Bedrooms)</label>
-                <select id="size-filter">
-                    <option value="all">All Sizes</option>
-                    <option value="1">1 Bedroom (Studio/Apartment)</option>
-                    <option value="2">2 Bedrooms</option>
-                    <option value="3">3 Bedrooms</option>
-                    <option value="4">4+ Bedrooms</option>
+                <label for="type-filter">House Type</label>
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <option value="Single Room">Single Room</option>
+                    <option value="Bedsitter">Bedsitter</option>
+                    <option value="2 Bedroom">2 Bedroom</option>
+                    <option value="3 Bedroom">3 Bedroom</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label for="max-price">Max Rent Amount ($/mo)</label>
-                <input type="number" id="max-price" placeholder="e.g. 2500" step="100">
+                <input type="number" id="max-price" placeholder="e.g. 2000" step="100">
             </div>
 
             <div class="filter-group">
@@ -227,67 +227,49 @@
     </main>
 
     <script>
-        // Sample Property Data
+        // Updated Property Data with specific image assignments
         const properties = [
             {
                 id: 1,
-                title: "Modern Cozy Studio",
-                size: 1,
-                price: 1200,
-                location: "Downtown, Cityville",
-                sqft: 550,
-                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80"
+                title: "Affordable Single Room",
+                type: "Single Room",
+                price: 400,
+                location: "Central Park Area",
+                sqft: 250,
+                image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80"
             },
             {
                 id: 2,
-                title: "Suburban Family Home",
-                size: 3,
-                price: 2800,
-                location: "Maple Street, Suburbia",
-                sqft: 1800,
-                image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80"
+                title: "Modern Studio Bedsitter",
+                type: "Bedsitter",
+                price: 750,
+                location: "Downtown District",
+                sqft: 450,
+                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80"
             },
             {
                 id: 3,
-                title: "Compact 2-Bed Apartment",
-                size: 2,
-                price: 1900,
-                location: "West End, Cityville",
-                sqft: 900,
+                title: "Cozy 2 Bedroom Apartment",
+                type: "2 Bedroom",
+                price: 1500,
+                location: "Westside Heights",
+                sqft: 850,
                 image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80"
             },
             {
                 id: 4,
-                title: "Luxury 4-Bedroom Villa",
-                size: 4,
-                price: 4500,
-                location: "Highland Heights",
-                sqft: 3200,
-                image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: 5,
-                title: "Spacious 3-Bed Townhouse",
-                size: 3,
+                title: "Spacious 3 Bedroom Family Home",
+                type: "3 Bedroom",
                 price: 2600,
-                location: "Riverfront Park",
-                sqft: 1550,
-                image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: 6,
-                title: "Budget 1-Bedroom Flat",
-                size: 1,
-                price: 950,
-                location: "Eastside, Cityville",
-                sqft: 480,
-                image: "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=600&q=80"
+                location: "Suburban Green Avenue",
+                sqft: 1600,
+                image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80"
             }
         ];
 
         // DOM Elements
         const container = document.getElementById('listings-container');
-        const sizeFilter = document.getElementById('size-filter');
+        const typeFilter = document.getElementById('type-filter');
         const maxPriceFilter = document.getElementById('max-price');
         const sortOrder = document.getElementById('sort-order');
         const resetBtn = document.getElementById('reset-btn');
@@ -295,16 +277,15 @@
 
         // Render Function
         function renderProperties() {
-            const selectedSize = sizeFilter.value;
+            const selectedType = typeFilter.value;
             const maxPrice = parseFloat(maxPriceFilter.value);
             const sort = sortOrder.value;
 
             // Filter logic
             let filtered = properties.filter(item => {
-                const matchesSize = selectedSize === 'all' || 
-                    (selectedSize === '4' ? item.size >= 4 : item.size === parseInt(selectedSize));
+                const matchesType = selectedType === 'all' || item.type === selectedType;
                 const matchesPrice = isNaN(maxPrice) || item.price <= maxPrice;
-                return matchesSize && matchesPrice;
+                return matchesType && matchesPrice;
             });
 
             // Sort logic
@@ -329,7 +310,7 @@
                         <h2 class="property-title">${item.title}</h2>
                         <div class="property-location">📍 ${item.location}</div>
                         <div class="property-meta">
-                            <span>🛏️ ${item.size} ${item.size === 1 ? 'Bed' : 'Beds'}</span>
+                            <span>🏠 ${item.type}</span>
                             <span>📐 ${item.sqft} sqft</span>
                         </div>
                     </div>
@@ -338,12 +319,12 @@
         }
 
         // Event Listeners
-        sizeFilter.addEventListener('change', renderProperties);
+        typeFilter.addEventListener('change', renderProperties);
         maxPriceFilter.addEventListener('input', renderProperties);
         sortOrder.addEventListener('change', renderProperties);
         
         resetBtn.addEventListener('click', () => {
-            sizeFilter.value = 'all';
+            typeFilter.value = 'all';
             maxPriceFilter.value = '';
             sortOrder.value = 'price-asc';
             renderProperties();
