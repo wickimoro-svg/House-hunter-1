@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Hunter - Find Your Dream Home</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Filter Controls */
+        .filter-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .filter-group select, 
+        .filter-group input {
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .filter-group select:focus, 
+        .filter-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .reset-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.65rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .reset-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Results Display */
+        .results-summary {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .property-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .property-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #cbd5e1;
+        }
+
+        .property-details {
+            padding: 1.25rem;
+        }
+
+        .property-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .property-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-location {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .property-meta {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-dark);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            background: var(--white);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🏠 HouseHunter</div>
+    </header>
+
+    <main class="container">
+        <!-- Filter Controls -->
+        <section class="filter-card">
+            <div class="filter-group">
+                <label for="size-filter">Property Size (Bedrooms)</label>
+                <select id="size-filter">
+                    <option value="all">All Sizes</option>
+                    <option value="1">1 Bedroom (Studio/Apartment)</option>
+                    <option value="2">2 Bedrooms</option>
+                    <option value="3">3 Bedrooms</option>
+                    <option value="4">4+ Bedrooms</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="max-price">Max Rent Amount ($/mo)</label>
+                <input type="number" id="max-price" placeholder="e.g. 2500" step="100">
+            </div>
+
+            <div class="filter-group">
+                <label for="sort-order">Sort By</label>
+                <select id="sort-order">
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                </select>
+            </div>
+
+            <button class="reset-btn" id="reset-btn">Reset Filters</button>
+        </section>
+
+        <div class="results-summary" id="results-count">Showing all listings</div>
+
+        <!-- House Listings Container -->
+        <section class="listings-grid" id="listings-container">
+            <!-- Dynamic elements loaded via JavaScript -->
+        </section>
+    </main>
+
+    <script>
+        // Sample Property Data
+        const properties = [
+            {
+                id: 1,
+                title: "Modern Cozy Studio",
+                size: 1,
+                price: 1200,
+                location: "Downtown, Cityville",
+                sqft: 550,
+                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 2,
+                title: "Suburban Family Home",
+                size: 3,
+                price: 2800,
+                location: "Maple Street, Suburbia",
+                sqft: 1800,
+                image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 3,
+                title: "Compact 2-Bed Apartment",
+                size: 2,
+                price: 1900,
+                location: "West End, Cityville",
+                sqft: 900,
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 4,
+                title: "Luxury 4-Bedroom Villa",
+                size: 4,
+                price: 4500,
+                location: "Highland Heights",
+                sqft: 3200,
+                image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 5,
+                title: "Spacious 3-Bed Townhouse",
+                size: 3,
+                price: 2600,
+                location: "Riverfront Park",
+                sqft: 1550,
+                image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 6,
+                title: "Budget 1-Bedroom Flat",
+                size: 1,
+                price: 950,
+                location: "Eastside, Cityville",
+                sqft: 480,
+                image: "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=600&q=80"
+            }
+        ];
+
+        // DOM Elements
+        const container = document.getElementById('listings-container');
+        const sizeFilter = document.getElementById('size-filter');
+        const maxPriceFilter = document.getElementById('max-price');
+        const sortOrder = document.getElementById('sort-order');
+        const resetBtn = document.getElementById('reset-btn');
+        const resultsCount = document.getElementById('results-count');
+
+        // Render Function
+        function renderProperties() {
+            const selectedSize = sizeFilter.value;
+            const maxPrice = parseFloat(maxPriceFilter.value);
+            const sort = sortOrder.value;
+
+            // Filter logic
+            let filtered = properties.filter(item => {
+                const matchesSize = selectedSize === 'all' || 
+                    (selectedSize === '4' ? item.size >= 4 : item.size === parseInt(selectedSize));
+                const matchesPrice = isNaN(maxPrice) || item.price <= maxPrice;
+                return matchesSize && matchesPrice;
+            });
+
+            // Sort logic
+            filtered.sort((a, b) => {
+                return sort === 'price-asc' ? a.price - b.price : b.price - a.price;
+            });
+
+            // Update DOM count
+            resultsCount.textContent = `Showing ${filtered.length} property${filtered.length === 1 ? '' : 'ies'}`;
+
+            // Render cards
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="no-results">No properties match your exact criteria.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <article class="property-card">
+                    <img class="property-img" src="${item.image}" alt="${item.title}">
+                    <div class="property-details">
+                        <div class="property-price">$${item.price.toLocaleString()} / mo</div>
+                        <h2 class="property-title">${item.title}</h2>
+                        <div class="property-location">📍 ${item.location}</div>
+                        <div class="property-meta">
+                            <span>🛏️ ${item.size} ${item.size === 1 ? 'Bed' : 'Beds'}</span>
+                            <span>📐 ${item.sqft} sqft</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Event Listeners
+        sizeFilter.addEventListener('change', renderProperties);
+        maxPriceFilter.addEventListener('input', renderProperties);
+        sortOrder.addEventListener('change', renderProperties);
+        
+        resetBtn.addEventListener('click', () => {
+            sizeFilter.value = 'all';
+            maxPriceFilter.value = '';
+            sortOrder.value = 'price-asc';
+            renderProperties();
+        });
+
+        // Initial Load
+        renderProperties();
+    </script>
+</body>
+</html>
