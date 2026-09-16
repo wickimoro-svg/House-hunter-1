@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Hunter - Find Your Dream Home</title>
+    <title>House Hunter - Platform Portal</title>
     <style>
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
             --bg-light: #f8fafc;
             --text-dark: #1e293b;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --white: #ffffff;
+            --danger: #ef4444;
+            --success: #22c55e;
         }
 
         * {
@@ -46,13 +49,115 @@
             color: var(--primary);
         }
 
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
         .container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
 
-        /* Filter Controls */
+        /* Views management */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* Form / Login Card Styles */
+        .login-card {
+            max-width: 400px;
+            margin: 3rem auto;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* User Dashboard Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
         .filter-card {
             background: var(--white);
             padding: 1.5rem;
@@ -65,54 +170,6 @@
             align-items: end;
         }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-
-        .filter-group select, 
-        .filter-group input {
-            padding: 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .filter-group select:focus, 
-        .filter-group input:focus {
-            border-color: var(--primary);
-        }
-
-        .reset-btn {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 0.65rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .reset-btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Results Display */
-        .results-summary {
-            margin-bottom: 1rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
         .listings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -123,21 +180,13 @@
             background: var(--white);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .property-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
         .property-img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
-            background-color: #cbd5e1;
         }
 
         .property-details {
@@ -145,40 +194,84 @@
         }
 
         .property-price {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 0.25rem;
         }
 
-        .property-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        /* Webmaster Admin Dashboard Styles */
+        .admin-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .metric-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
             margin-bottom: 0.5rem;
         }
 
-        .property-location {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+        .metric-card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
         }
 
-        .property-meta {
-            display: flex;
-            justify-content: space-between;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.875rem;
-            color: var(--text-dark);
-        }
-
-        .no-results {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-muted);
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
             background: var(--white);
             border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
         }
     </style>
 </head>
@@ -186,152 +279,268 @@
 
     <header>
         <div class="logo">🏠 House Hunter</div>
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('user-tab')">User Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('webmaster-tab')">Webmaster Portal</button>
+        </nav>
     </header>
 
     <main class="container">
-        <!-- Filter Controls -->
-        <section class="filter-card">
-            <div class="filter-group">
-                <label for="type-filter">House Type</label>
-                <select id="type-filter">
-                    <option value="all">All Types</option>
-                    <option value="Single Room">Single Room</option>
-                    <option value="Bedsitter">Bedsitter</option>
-                    <option value="2 Bedroom">2 Bedroom</option>
-                    <option value="3 Bedroom">3 Bedroom</option>
-                </select>
+        
+        <!-- USER DASHBOARD VIEW -->
+        <section id="user-tab" class="view active">
+            <div class="dashboard-header">
+                <h2>Explore Available Houses</h2>
             </div>
 
-            <div class="filter-group">
-                <label for="max-price">Max Rent Amount ($/mo)</label>
-                <input type="number" id="max-price" placeholder="e.g. 2000" step="100">
+            <!-- Filters -->
+            <div class="filter-card">
+                <div class="form-group">
+                    <label for="type-filter">House Type</label>
+                    <select id="type-filter" onchange="filterProperties()">
+                        <option value="all">All Types</option>
+                        <option value="Single Room">Single Room</option>
+                        <option value="Bedsitter">Bedsitter</option>
+                        <option value="2 Bedroom">2 Bedroom</option>
+                        <option value="3 Bedroom">3 Bedroom</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="max-price">Max Rent ($/mo)</label>
+                    <input type="number" id="max-price" placeholder="e.g. 2000" oninput="filterProperties()">
+                </div>
             </div>
 
-            <div class="filter-group">
-                <label for="sort-order">Sort By</label>
-                <select id="sort-order">
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                </select>
+            <!-- House Cards -->
+            <div class="listings-grid" id="user-listings">
+                <!-- Dynamically populated -->
             </div>
-
-            <button class="reset-btn" id="reset-btn">Reset Filters</button>
         </section>
 
-        <div class="results-summary" id="results-count">Showing all listings</div>
+        <!-- WEBMASTER DASHBOARD VIEW -->
+        <section id="webmaster-tab" class="view">
+            
+            <!-- Webmaster Login Panel -->
+            <div id="admin-login-panel" class="login-card">
+                <h2>Webmaster Login</h2>
+                <form id="admin-form" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label for="admin-user">Username</label>
+                        <input type="text" id="admin-user" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-pass">Password</label>
+                        <input type="password" id="admin-pass" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn">Login as Webmaster</button>
+                    <div id="login-error" class="error-msg">Invalid credentials! (Try: admin / admin123)</div>
+                </form>
+            </div>
 
-        <!-- House Listings Container -->
-        <section class="listings-grid" id="listings-container">
-            <!-- Dynamic elements loaded via JavaScript -->
+            <!-- Admin Content (Hidden until login) -->
+            <div id="admin-dashboard-panel" style="display: none;">
+                <div class="dashboard-header">
+                    <h2>Webmaster System Control</h2>
+                    <button class="btn btn-danger" style="width: auto;" onclick="handleAdminLogout()">Logout</button>
+                </div>
+
+                <!-- System Metrics -->
+                <div class="admin-metrics">
+                    <div class="metric-card">
+                        <h3>Total Listings</h3>
+                        <p id="metric-listings">4</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Active Users</h3>
+                        <p>1,248</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>System Status</h3>
+                        <p style="color: var(--success); font-size: 1.2rem;">● Operational</p>
+                    </div>
+                </div>
+
+                <!-- Add New House Listing Form -->
+                <div class="filter-card" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="form-group">
+                        <label for="new-title">House Title</label>
+                        <input type="text" id="new-title" placeholder="e.g. Modern Studio">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-type">Type</label>
+                        <select id="new-type">
+                            <option value="Single Room">Single Room</option>
+                            <option value="Bedsitter">Bedsitter</option>
+                            <option value="2 Bedroom">2 Bedroom</option>
+                            <option value="3 Bedroom">3 Bedroom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-price">Price ($)</label>
+                        <input type="number" id="new-price" placeholder="500">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-img">Image URL</label>
+                        <input type="text" id="new-img" placeholder="https://...">
+                    </div>
+                    <button class="btn" onclick="addHouseListing()">Add Listing</button>
+                </div>
+
+                <!-- Manage Listings Data Table -->
+                <h3 style="margin-bottom: 1rem;">Manage Existing Listings</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
         </section>
+
     </main>
 
     <script>
-        // Updated Property Data with specific image assignments
-        const properties = [
-            {
-                id: 1,
-                title: "Affordable Single Room",
-                type: "Single Room",
-                price: 400,
-                location: "Central Park Area",
-                sqft: 250,
-                image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: 2,
-                title: "Modern Studio Bedsitter",
-                type: "Bedsitter",
-                price: 750,
-                location: "Downtown District",
-                sqft: 450,
-                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: 3,
-                title: "Cozy 2 Bedroom Apartment",
-                type: "2 Bedroom",
-                price: 1500,
-                location: "Westside Heights",
-                sqft: 850,
-                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: 4,
-                title: "Spacious 3 Bedroom Family Home",
-                type: "3 Bedroom",
-                price: 2600,
-                location: "Suburban Green Avenue",
-                sqft: 1600,
-                image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80"
-            }
+        // Data Store
+        let properties = [
+            { id: 1, title: "Affordable Single Room", type: "Single Room", price: 400, image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80" },
+            { id: 2, title: "Modern Studio Bedsitter", type: "Bedsitter", price: 750, image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80" },
+            { id: 3, title: "Cozy 2 Bedroom Apartment", type: "2 Bedroom", price: 1500, image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80" },
+            { id: 4, title: "Spacious 3 Bedroom Family Home", type: "3 Bedroom", price: 2600, image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80" }
         ];
 
-        // DOM Elements
-        const container = document.getElementById('listings-container');
-        const typeFilter = document.getElementById('type-filter');
-        const maxPriceFilter = document.getElementById('max-price');
-        const sortOrder = document.getElementById('sort-order');
-        const resetBtn = document.getElementById('reset-btn');
-        const resultsCount = document.getElementById('results-count');
+        let isAdminLoggedIn = false;
 
-        // Render Function
-        function renderProperties() {
-            const selectedType = typeFilter.value;
-            const maxPrice = parseFloat(maxPriceFilter.value);
-            const sort = sortOrder.value;
+        // View Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
 
-            // Filter logic
-            let filtered = properties.filter(item => {
-                const matchesType = selectedType === 'all' || item.type === selectedType;
-                const matchesPrice = isNaN(maxPrice) || item.price <= maxPrice;
-                return matchesType && matchesPrice;
-            });
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
 
-            // Sort logic
-            filtered.sort((a, b) => {
-                return sort === 'price-asc' ? a.price - b.price : b.price - a.price;
-            });
-
-            // Update DOM count
-            resultsCount.textContent = `Showing ${filtered.length} property${filtered.length === 1 ? '' : 'ies'}`;
-
-            // Render cards
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="no-results">No properties match your exact criteria.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
+        // Render User Listings
+        function renderUserListings(items = properties) {
+            const container = document.getElementById('user-listings');
+            container.innerHTML = items.map(item => `
                 <article class="property-card">
                     <img class="property-img" src="${item.image}" alt="${item.title}">
                     <div class="property-details">
-                        <div class="property-price">$${item.price.toLocaleString()} / mo</div>
-                        <h2 class="property-title">${item.title}</h2>
-                        <div class="property-location">📍 ${item.location}</div>
-                        <div class="property-meta">
-                            <span>🏠 ${item.type}</span>
-                            <span>📐 ${item.sqft} sqft</span>
-                        </div>
+                        <div class="property-price">$${item.price} / mo</div>
+                        <h3 style="font-size: 1.1rem; margin: 0.5rem 0;">${item.title}</h3>
+                        <span class="status-badge status-active">${item.type}</span>
                     </div>
                 </article>
             `).join('');
         }
 
-        // Event Listeners
-        typeFilter.addEventListener('change', renderProperties);
-        maxPriceFilter.addEventListener('input', renderProperties);
-        sortOrder.addEventListener('change', renderProperties);
-        
-        resetBtn.addEventListener('click', () => {
-            typeFilter.value = 'all';
-            maxPriceFilter.value = '';
-            sortOrder.value = 'price-asc';
-            renderProperties();
-        });
+        // Filter User Listings
+        function filterProperties() {
+            const type = document.getElementById('type-filter').value;
+            const maxPrice = parseFloat(document.getElementById('max-price').value);
+
+            const filtered = properties.filter(item => {
+                const matchesType = type === 'all' || item.type === type;
+                const matchesPrice = isNaN(maxPrice) || item.price <= maxPrice;
+                return matchesType && matchesPrice;
+            });
+
+            renderUserListings(filtered);
+        }
+
+        // Handle Admin Login
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            if (user === 'admin' && pass === 'admin123') {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login-panel').style.display = 'none';
+                document.getElementById('admin-dashboard-panel').style.display = 'block';
+                document.getElementById('login-error').style.display = 'none';
+                renderAdminTable();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        // Handle Admin Logout
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-login-panel').style.display = 'block';
+            document.getElementById('admin-dashboard-panel').style.display = 'none';
+            document.getElementById('admin-form').reset();
+        }
+
+        // Render Admin Table
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            document.getElementById('metric-listings').textContent = properties.length;
+
+            tbody.innerHTML = properties.map(item => `
+                <tr>
+                    <td>#${item.id}</td>
+                    <td>${item.title}</td>
+                    <td>${item.type}</td>
+                    <td>$${item.price}</td>
+                    <td><span class="status-badge status-active">Published</span></td>
+                    <td>
+                        <button class="action-btn btn-danger" onclick="deleteListing(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Add Listing (Webmaster capability)
+        function addHouseListing() {
+            const title = document.getElementById('new-title').value;
+            const type = document.getElementById('new-type').value;
+            const price = parseFloat(document.getElementById('new-price').value);
+            const image = document.getElementById('new-img').value || 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80';
+
+            if (!title || isNaN(price)) {
+                alert('Please fill in title and price!');
+                return;
+            }
+
+            const newHouse = {
+                id: Date.now(),
+                title,
+                type,
+                price,
+                image
+            };
+
+            properties.push(newHouse);
+            renderUserListings();
+            renderAdminTable();
+
+            // Reset inputs
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-price').value = '';
+            document.getElementById('new-img').value = '';
+        }
+
+        // Delete Listing (Webmaster capability)
+        function deleteListing(id) {
+            properties = properties.filter(item => item.id !== id);
+            renderUserListings();
+            renderAdminTable();
+        }
 
         // Initial Load
-        renderProperties();
+        renderUserListings();
     </script>
 </body>
 </html>
